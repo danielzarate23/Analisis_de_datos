@@ -87,7 +87,7 @@ def ensure_business_columns(df: pd.DataFrame):
                 / df["Saldo Insoluto Actual"]
             ).replace([np.inf, -np.inf], np.nan).fillna(0)
 
-    # EBITDA proxy simple (ilustrativo – ajusta a tu fórmula real si la tienes)
+    # EBITDA proxy simple
     if "EBITDA" not in df.columns:
         tasa_interes_mensual = 0.65 / 12
         costo_fondeo_mensual = 0.11 / 12
@@ -177,7 +177,7 @@ try:
     if uploaded:
         base = load_excel(uploaded, sheet_name=None)
     else:
-        # 👉 ahora usamos tu archivo agregado por región
+        # 👉 archivo por defecto
         base = load_excel("MasterSucursalestemporal (1).xlsx", sheet_name=None)
 except Exception as e:
     st.error(f"No se pudo leer el archivo. Detalle: {e}")
@@ -195,10 +195,15 @@ if target_sheet is None:
 df = base[target_sheet].copy()
 df.columns = [str(c).strip() for c in df.columns]
 
+# 🔥 QUITAMOS EL RENGLÓN "TOTAL" PARA QUE NO ENTRE A KPIs NI GRÁFICOS
+if "Región" in df.columns:
+    df["Región"] = df["Región"].astype(str).str.strip()
+    df = df[df["Región"].str.lower() != "total"].copy()
+
 # Asegura columnas negocio
 df = ensure_business_columns(df)
 
-# Normaliza tipos
+# Normaliza tipos (ya sin la fila Total)
 if "Región" in df.columns:
     df["Región"] = df["Región"].astype(str).str.strip()
 if "Vendedor" in df.columns:
@@ -364,7 +369,7 @@ st.dataframe(
 )
 
 # -----------------------------
-# 6) Visualizaciones adicionales (versión revisada)
+# 6) Visualizaciones adicionales
 # -----------------------------
 st.markdown("### Visualizaciones adicionales")
 
@@ -393,7 +398,12 @@ else:
 
 # 6.2 Top 10 regiones por cartera vencida (barras horizontales apiladas)
 st.markdown("#### Top 10 regiones por cartera vencida (composición vigente / 30-89 / vencido)")
-if {"Región", "Saldo Insoluto Actual", "Saldo Insoluto Vencido Actual", "Saldo Insoluto 30-89  Actual"}.issubset(df.columns):
+if {
+    "Región",
+    "Saldo Insoluto Actual",
+    "Saldo Insoluto Vencido Actual",
+    "Saldo Insoluto 30-89  Actual",
+}.issubset(df.columns):
     df_comp = df.copy()
     df_comp["Saldo Vigente"] = (
         df_comp["Saldo Insoluto Actual"]
@@ -470,4 +480,3 @@ for i, col in enumerate(colr):
 # -----------------------------
 st.markdown("---")
 st.caption("Dimex • Tablero analítico (prototipo) – Datos históricos, no en tiempo real.")
-
