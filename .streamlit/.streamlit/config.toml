@@ -1,0 +1,6 @@
+[theme]
+primaryColor="#7CFF00"              # Verde Dimex
+backgroundColor="#FFFFFF"           # Fondo blanco
+secondaryBackgroundColor="#001B3A"  # Azul marino Dimex
+textColor="#001B3A"                 # Texto en azul marino
+font="sans serif"
