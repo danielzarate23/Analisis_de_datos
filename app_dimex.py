@@ -133,7 +133,7 @@ logo_path = "dimex_logo.jpg"  # asegúrate que el JPG está en la misma carpeta
 if os.path.exists(logo_path):
     cols_logo = st.columns([0.15, 0.85])
     with cols_logo[0]:
-        st.image(logo_path, use_container_width=True)
+        st.image(logo_path, use_column_width=True)
     with cols_logo[1]:
         st.title("Desempeño Sucursales – Dimex")
 else:
